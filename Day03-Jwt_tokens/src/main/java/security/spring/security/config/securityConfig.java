@@ -19,12 +19,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Configuration
 @EnableWebSecurity
 public class securityConfig {
+
+    @Autowired
+    private JwtFilter jwtFilter;
 
 
     @Bean
@@ -33,10 +37,14 @@ public class securityConfig {
 
        return http.
                 csrf(customizer->customizer.disable())
-                .authorizeHttpRequests(request->request.anyRequest().authenticated())
+                .authorizeHttpRequests(request->request
+                                .requestMatchers("register","login")
+                        .permitAll()
+                        .anyRequest().authenticated())
 //                .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+               .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class )
                 .build();
 
 

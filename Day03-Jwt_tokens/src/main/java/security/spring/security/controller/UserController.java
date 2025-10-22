@@ -22,4 +22,12 @@ public class UserController {
         users.setPassword(encoder.encode(users.getPassword()));
         return userService.saveUser(users);
     }
+
+
+    @PostMapping("/login")
+    public String login(@RequestBody Users user){
+        System.out.println("user: "+user);
+       // return "Successful";
+        return userService.verify(user);
+    }
 }
